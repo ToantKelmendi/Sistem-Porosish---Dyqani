@@ -225,15 +225,12 @@ dyqani-teknologjik/
 
 ## Ndërfaqja në shfletues
 
-Dosja `nderfaqja/` përmban pesë faqe që hapen drejtpërdrejt në shfletues, pa server:
+Dosja `nderfaqja/` përmban një faqe që hapet drejtpërdrejt në shfletues, pa server:
 
 | Faqja | Për kë |
 | --- | --- |
 | `Dyqani.dc.html` | Klienti: produktet, porosia, statusi, kthimi |
-| `Konsola e Operacioneve.dc.html` | Operatori: shërbimet, ngjarjet, radhët, stoku |
-| `Prezantimi ne Browser.dc.html` | Dokumentimi i kritereve dhe demoja |
-| `Kriteret e Vleresimit.dc.html` | Harta e 24 nën-kritereve |
-| `Udhezues Browser.dc.html` | Udhëzuesi i prezantimit |
+
 
 Dyqani dhe konsola ndajnë të njëjtën gjendje: një porosi e bërë në dyqan shfaqet
 menjëherë si ngjarje në konsolë. Konsola ka edhe modalitetin **Sistemi real**,
@@ -241,7 +238,6 @@ që dërgon kërkesa të vërteta te `:8001` me API key.
 
 ## Dokumentet
 
-- `dokumente/Raport-Teknik-Toant-Kelmendi.docx` — raporti teknik, kapitujt 1–9
 - `dokumente/Deklarata-e-Origjinalitetit.docx` — deklarata e punës individuale
 
 ## Licenca
