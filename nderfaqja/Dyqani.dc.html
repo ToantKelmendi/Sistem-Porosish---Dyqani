@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta charset="utf-8">
+<title>Dyqani Teknologjik — porositë online</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600&amp;family=Lora:ital,wght@0,400;0,600;1,400&amp;display=swap">
+<link rel="stylesheet" href="_ds/classical-ac7cc800-95d2-486e-9ca5-dfdbad868ff6/styles.css">
+<script src="_ds/classical-ac7cc800-95d2-486e-9ca5-dfdbad868ff6/_ds_bundle.js"></script>
+<style>
+  body { margin: 0; background: var(--color-bg, #f3f2f2); color: var(--color-text, #201f1d); font-family: 'Lora', Georgia, serif; font-size: 15px; line-height: 1.6; scroll-behavior: smooth; }
+  *, *::before, *::after { box-sizing: border-box; }
+  a { color: #7d5411; text-underline-offset: 3px; }
+  a:hover { color: #b68235; }
+  input, select, button, textarea { font: inherit; }
+  :focus-visible { outline: 2px solid #b68235; outline-offset: 2px; }
+  ::selection { background: rgba(182,130,53,.3); }
+</style>
+</helmet>
+
+<div style="max-width:1200px;margin:0 auto;padding:0 28px 96px">
+
+  <header style="position:sticky;top:0;z-index:5;background:var(--color-bg, #f3f2f2);border-bottom:1px solid var(--color-divider, rgba(32,31,29,.16));display:flex;flex-wrap:wrap;align-items:center;gap:20px;padding:16px 0">
+    <div style="display:flex;flex-direction:column;gap:1px;margin-right:auto">
+      <span style="font-family:'Cormorant Garamond',serif;font-weight:600;font-size:21px">Dyqani Teknologjik</span>
+      <span style="font-size:13px;color:#605d5d">Porosi online · dërgesa brenda 48 orëve</span>
+    </div>
+    <a href="#produktet" style="font-size:14px">Produktet</a>
+    <a href="#porosite" style="font-size:14px">Porositë e mia</a>
+    <a href="#kthimi" style="font-size:14px">Kthimi</a>
+    <span style="{{ sessionBadgeStyle }}">{{ sessionBadge }}</span>
+    <sc-if value="{{ loggedIn }}" hint-placeholder-val="{{ false }}">
+      <button onClick="{{ logout }}" style="cursor:pointer;font-size:13px;color:#605d5d;background:transparent;border:1px solid var(--color-divider, rgba(32,31,29,.16));padding:6px 13px;border-radius:4px" style-hover="background:rgba(32,31,29,.07)">Çkyçu</button>
+    </sc-if>
+  </header>
+
+  <sc-if value="{{ notice }}" hint-placeholder-val="{{ false }}">
+    <div style="{{ noticeStyle }}">{{ notice }}</div>
+  </sc-if>
+
+  <section style="display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:56px;align-items:end;padding:44px 0 32px;border-bottom:1px solid var(--color-divider, rgba(32,31,29,.16))">
+    <div style="display:flex;flex-direction:column;gap:18px">
+      <div style="font-family:'Cormorant Garamond',serif;font-size:13px;letter-spacing:.2em;text-transform:uppercase;color:#7d5411">Pajisje kompjuterike · stok i verifikuar</div>
+      <h1 style="font-family:'Cormorant Garamond',serif;font-weight:400;font-size:58px;line-height:1.03;letter-spacing:-.02em;margin:0">Porosia konfirmohet<br>në sekonda</h1>
+      <p style="margin:0;font-size:19px;line-height:1.55;max-width:48ch;font-style:italic;color:#444141">Stoku kontrollohet automatikisht pas porosisë. Nëse artikulli mungon, e mësoni brenda momentit dhe nuk paguani asgjë.</p>
+    </div>
+    <sc-if value="{{ loggedIn }}" hint-placeholder-val="{{ false }}">
+      <div style="border:1px solid var(--color-divider, rgba(32,31,29,.16));border-radius:4px;padding:20px 22px;display:flex;flex-direction:column;gap:10px">
+        <div style="font-family:'Cormorant Garamond',serif;font-weight:600;font-size:19px">I mirëseardhur, {{ sessionName }}</div>
+        <div style="height:1px;background:var(--color-divider, rgba(32,31,29,.16))"></div>
+        <div style="display:flex;justify-content:space-between;gap:14px;font-size:14px"><span style="color:#605d5d">Email</span><span style="font-family:ui-monospace,Menlo,monospace;font-size:13px">{{ sessionEmail }}</span></div>
+        <div style="display:flex;justify-content:space-between;gap:14px;font-size:14px"><span style="color:#605d5d">Porositë e mia</span><span style="font-variant-numeric:tabular-nums">{{ myOrdersCount }}</span></div>
+        <div style="font-size:13px;color:#605d5d;line-height:1.5">Të dhënat tuaja mbahen vetëm për këtë porosi; emaili shërben si identifikues unik i klientit.</div>
+      </div>
+    </sc-if>
+    <sc-if value="{{ loggedOut }}" hint-placeholder-val="{{ true }}">
+      <div style="border:1px solid #b68235;border-radius:4px;padding:20px 22px;display:flex;flex-direction:column;gap:12px">
+        <div style="font-family:'Cormorant Garamond',serif;font-weight:600;font-size:19px">Hyni për të porositur</div>
+        <div style="font-size:13.5px;color:#605d5d;line-height:1.5">Pa fjalëkalim: emaili identifikon klientin dhe lidh porositë tuaja.</div>
+        <label style="display:flex;flex-direction:column;gap:5px">
+          <span style="font-size:13px;color:#605d5d">Emri dhe mbiemri</span>
+          <input value="{{ loginName }}" onChange="{{ onLoginName }}" placeholder="Emri dhe mbiemri juaj" style="width:100%;min-height:40px;padding:8px 11px;font-size:15px;background:transparent;border:1px solid var(--color-divider, rgba(32,31,29,.16));border-radius:4px;color:#201f1d">
+        </label>
+        <label style="display:flex;flex-direction:column;gap:5px">
+          <span style="font-size:13px;color:#605d5d">Email</span>
+          <input value="{{ loginEmail }}" onChange="{{ onLoginEmail }}" placeholder="emri@example.com" style="width:100%;min-height:40px;padding:8px 11px;font-size:15px;background:transparent;border:1px solid var(--color-divider, rgba(32,31,29,.16));border-radius:4px;color:#201f1d">
+        </label>
+        <button onClick="{{ login }}" style="cursor:pointer;font-family:'Cormorant Garamond',serif;font-weight:600;font-size:15px;color:#b68235;background:transparent;border:1px solid #b68235;padding:11px 20px;border-radius:4px" style-hover="background:rgba(182,130,53,.12)" style-active="background:rgba(182,130,53,.22)">Hyr</button>
+      </div>
+    </sc-if>
+  </section>
+
+  <section id="produktet" style="padding:44px 0 0">
+    <div style="display:flex;align-items:baseline;justify-content:space-between;gap:20px;flex-wrap:wrap;margin-bottom:20px">
+      <h2 style="font-family:'Cormorant Garamond',serif;font-weight:400;font-size:38px;line-height:1.1;margin:0">Produktet</h2>
+      <span style="font-size:14px;color:#605d5d">{{ stockNote }}</span>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:20px">
+      <sc-for list="{{ products }}" as="p" hint-placeholder-count="7">
+        <div style="{{ p.cardStyle }}">
+          <div style="border:1px solid var(--color-divider, rgba(32,31,29,.16));background:#fff;padding:10px;border-radius:2px">
+            <img src="{{ p.image }}" alt="{{ p.name }}" style="display:block;width:100%;height:190px;object-fit:contain">
+          </div>
+          <div style="display:flex;align-items:baseline;justify-content:space-between;gap:14px">
+            <span style="font-family:'Cormorant Garamond',serif;font-weight:600;font-size:21px">{{ p.name }}</span>
+            <span style="font-size:13px;color:#605d5d">{{ p.category }}</span>
+          </div>
+          <div style="height:1px;background:var(--color-divider, rgba(32,31,29,.16))"></div>
+          <p style="margin:0;font-size:14.5px;line-height:1.55;color:#444141">{{ p.blurb }}</p>
+          <div style="display:flex;align-items:baseline;justify-content:space-between;gap:14px;margin-top:auto">
+            <span style="font-family:'Cormorant Garamond',serif;font-size:26px;font-variant-numeric:tabular-nums">{{ p.priceLabel }}</span>
+            <span style="{{ p.stockStyle }}">{{ p.stockLabel }}</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px">
+            <label style="display:flex;align-items:center;gap:8px;font-size:13px;color:#605d5d">
+              Sasia
+              <input value="{{ p.qty }}" onChange="{{ p.onQty }}" style="width:62px;min-height:36px;padding:6px 9px;font-size:14px;font-variant-numeric:tabular-nums;background:transparent;border:1px solid var(--color-divider, rgba(32,31,29,.16));border-radius:4px;color:#201f1d">
+            </label>
+            <button onClick="{{ p.order }}" style="{{ p.btnStyle }}">{{ p.btnLabel }}</button>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+
+  <section id="porosite" style="padding:56px 0 0">
+    <div style="display:flex;align-items:baseline;justify-content:space-between;gap:20px;flex-wrap:wrap;margin-bottom:8px">
+      <h2 style="font-family:'Cormorant Garamond',serif;font-weight:400;font-size:38px;line-height:1.1;margin:0">Porositë e mia</h2>
+      <span style="font-size:14px;color:#605d5d">Statusi përditësohet vetë sapo verifikohet stoku</span>
+    </div>
+    <p style="margin:0 0 18px;font-size:15px;color:#444141;max-width:82ch">{{ ordersIntro }}</p>
+    <div style="display:flex;flex-direction:column;gap:14px">
+      <sc-for list="{{ myOrders }}" as="o" hint-placeholder-count="2">
+        <div style="border:1px solid var(--color-divider, rgba(32,31,29,.16));border-radius:4px;padding:18px 20px;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:16px 24px;align-items:start">
+          <div style="display:flex;flex-direction:column;gap:5px">
+            <div style="display:flex;align-items:baseline;gap:12px;flex-wrap:wrap">
+              <span style="font-family:'Cormorant Garamond',serif;font-weight:600;font-size:20px">Porosia #{{ o.id }}</span>
+              <span style="font-size:13px;color:#605d5d;font-variant-numeric:tabular-nums">{{ o.created }}</span>
+            </div>
+            <span style="font-size:15px;color:#444141">{{ o.itemsLabel }} · {{ o.total }}</span>
+            <span style="font-size:14px;color:#201f1d">{{ o.message }}</span>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:9px;align-items:flex-end">
+            <span style="{{ o.pillStyle }}">{{ o.statusLabel }}</span>
+            <sc-if value="{{ o.canReturn }}" hint-placeholder-val="{{ false }}">
+              <button onClick="{{ o.requestReturn }}" style="cursor:pointer;font-size:13px;color:#7d5411;background:transparent;border:1px solid #b68235;padding:7px 14px;border-radius:4px;white-space:nowrap" style-hover="background:rgba(182,130,53,.12)">Kërko kthim</button>
+            </sc-if>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+
+  <section id="kthimi" style="padding:56px 0 0">
+    <h2 style="font-family:'Cormorant Garamond',serif;font-weight:400;font-size:38px;line-height:1.1;margin:0 0 20px">Kthimi, pagesa dhe të dhënat</h2>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:24px">
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div style="font-family:'Cormorant Garamond',serif;font-weight:600;font-size:20px">Kthimi brenda 14 ditëve</div>
+        <div style="height:1px;background:var(--color-divider, rgba(32,31,29,.16))"></div>
+        <p style="margin:0;font-size:14.5px;line-height:1.6;color:#444141">Kthimi kërkohet me një klikim te porosia përkatëse. Sapo pranohet, sasia rikthehet automatikisht në stok dhe statusi kalon në <em>E kthyer</em> — kjo dukshëm ndryshon inventarin, nuk është vetëm shënim.</p>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div style="font-family:'Cormorant Garamond',serif;font-weight:600;font-size:20px">Nëse artikulli mungon</div>
+        <div style="height:1px;background:var(--color-divider, rgba(32,31,29,.16))"></div>
+        <p style="margin:0;font-size:14.5px;line-height:1.6;color:#444141">Porosia pranohet gjithmonë, por rezervimi bëhet vetëm nëse stoku mbulon sasinë e plotë. Kur nuk e mbulon, statusi kalon në <em>Stok i pamjaftueshëm</em>, njoftimi shkon me email dhe nuk kryhet pagesë.</p>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div style="font-family:'Cormorant Garamond',serif;font-weight:600;font-size:20px">Të dhënat tuaja</div>
+        <div style="height:1px;background:var(--color-divider, rgba(32,31,29,.16))"></div>
+        <p style="margin:0;font-size:14.5px;line-height:1.6;color:#444141">Mbahen vetëm emri dhe emaili — sa duhet për porosinë dhe njoftimin. Emaili është unik për klient. Nuk ruajmë të dhëna karte; pagesa kryhet në dorëzim.</p>
+      </div>
+    </div>
+  </section>
+
+  <footer style="margin-top:56px;padding-top:22px;border-top:1px solid var(--color-divider, rgba(32,31,29,.16));display:flex;justify-content:space-between;gap:24px;flex-wrap:wrap;font-size:14px;color:#605d5d">
+    <span>Dyqani Teknologjik · demonstrim akademik, UBT 2026</span>
+    <span>Toant Kelmendi · Sistemet e Procesimit të Dhënave Dizajnuese</span>
+  </footer>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1200}}">
+const PILL = "display:inline-flex;align-items:center;font-size:13px;padding:5px 13px;border-radius:3px;white-space:nowrap;";
+const STATUS = {
+  pending:  { label: "Në verifikim",        style: PILL + "border:1px solid rgba(32,31,29,.28);color:#605d5d",
+              msg: "Porosia u regjistrua. Po verifikohet stoku — statusi përditësohet brenda sekondash." },
+  reserved: { label: "Konfirmuar",          style: PILL + "border:1px solid #b68235;color:#7d5411",
+              msg: "Stoku u rezervua për ju. Email konfirmimi u dërgua; dërgesa niset brenda 48 orëve." },
+  failed:   { label: "Stok i pamjaftueshëm", style: PILL + "border:1px solid #201f1d;color:#201f1d",
+              msg: "Sasia e kërkuar nuk ishte në magazinë. Nuk kryhet pagesë; provoni një sasi më të vogël." },
+  returned: { label: "E kthyer",            style: PILL + "border:1px solid rgba(32,31,29,.28);color:#201f1d",
+              msg: "Kthimi u pranua dhe sasia u rikthye në stok. Rimbursimi kryhet brenda 5 ditëve pune." },
+};
+const CARD = "border:1px solid var(--color-divider, rgba(32,31,29,.16));border-radius:4px;padding:20px 22px;display:flex;flex-direction:column;gap:12px;min-height:100%;";
+const CARD_OUT = CARD + "border-style:dashed;";
+const STOCK_OK = "font-size:13px;color:#605d5d";
+const STOCK_LOW = PILL + "border:1px solid #b68235;color:#7d5411";
+const STOCK_OUT = PILL + "border:1px solid #201f1d;color:#201f1d";
+const BTN = "cursor:pointer;font-family:'Cormorant Garamond',serif;font-weight:600;font-size:14px;color:#b68235;background:transparent;border:1px solid #b68235;padding:9px 16px;border-radius:4px;margin-left:auto;";
+const BTN_OFF = "cursor:not-allowed;font-family:'Cormorant Garamond',serif;font-weight:600;font-size:14px;color:#605d5d;background:transparent;border:1px solid var(--color-divider, rgba(32,31,29,.16));padding:9px 16px;border-radius:4px;margin-left:auto;";
+const NOTICE = "margin-top:18px;border:1px solid #b68235;border-radius:4px;padding:13px 18px;font-size:14.5px;color:#201f1d;background:rgba(182,130,53,.08)";
+
+class Component extends DCLogic {
+  state = {
+    store: null,
+    qty: {},
+    login: { name: "", email: "" },
+    notice: "",
+  };
+
+  async componentDidMount() {
+    this._mod = await import("./spdd-store.js");
+    this.setState({ store: this._mod.load() });
+    this._unsub = this._mod.subscribe((next) => this.setState({ store: next }));
+  }
+
+  componentWillUnmount() {
+    if (this._unsub) this._unsub();
+    (this._timers || []).forEach(clearTimeout);
+  }
+
+  _later(fn, ms) {
+    const t = setTimeout(fn, ms);
+    (this._timers = this._timers || []).push(t);
+    return t;
+  }
+
+  _commit(next) {
+    const saved = this._mod.save(next);
+    this.setState({ store: saved });
+    return saved;
+  }
+
+  login = () => {
+    const { name, email } = this.state.login;
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      this.setState({ notice: "Emaili nuk është i vlefshëm — kontrollo formatin (emri@example.com)." });
+      return;
+    }
+    const next = Object.assign({}, this.state.store, { session: { name: name.trim() || "Klient", email: email.trim().toLowerCase() } });
+    this._commit(next);
+    this.setState({ notice: "Hyrja u krye. Emaili juaj është identifikuesi unik i klientit." });
+  };
+
+  logout = () => {
+    this._commit(Object.assign({}, this.state.store, { session: null }));
+    this.setState({ notice: "" });
+  };
+
+  /** Krijon porosinë (analogu i POST /orders) dhe pas kësaj thërret kontrollin e stokut. */
+  order = (product) => {
+    const s = this.state.store;
+    if (!s.session) {
+      this.setState({ notice: "Hyni me email para porosisë — porosia lidhet me klientin." });
+      return;
+    }
+    const qty = Math.max(1, parseInt(this.state.qty[product.id], 10) || 1);
+    const id = s.nextOrderId;
+    const time = this._mod.stamp();
+    const next = Object.assign({}, s, {
+      nextOrderId: id + 1,
+      orders: [{ id, customer: s.session.name, email: s.session.email, productId: product.id,
+                 productName: product.name, qty, unitPrice: product.price,
+                 status: "pending", created: time, source: "dyqani" }].concat(s.orders),
+      events: [{ kind: "info", label: "Porosi e re e pranuar",
+                 detail: "Porosia " + id + " — " + qty + " × " + product.name,
+                 tech: "order.created · order-service → orders_exchange", time }].concat(s.events).slice(0, 16),
+    });
+    this._commit(next);
+    this.setState({ notice: "Porosia #" + id + " u regjistruar. Po verifikohet stoku…" });
+    this._later(() => {
+      const resolved = this._mod.resolveStock(this.state.store, id);
+      this._commit(resolved);
+      const order = resolved.orders.find((o) => o.id === id);
+      this.setState({
+        notice: order.status === "reserved"
+          ? "Porosia #" + id + " u konfirmua — email konfirmimi u dërgua."
+          : "Porosia #" + id + " nuk u plotësua: stok i pamjaftueshëm. Nuk kryhet pagesë.",
+      });
+    }, 1400);
+  };
+
+  requestReturn = (orderId) => {
+    this._commit(this._mod.returnOrder(this.state.store, orderId));
+    this.setState({ notice: "Kthimi për porosinë #" + orderId + " u pranua — sasia u rikthye në stok." });
+  };
+
+  renderVals() {
+    const s = this.state.store;
+    if (!s) {
+      return { products: [], myOrders: [], proofs: [], loggedIn: false, loggedOut: true,
+               notice: "", sessionBadge: "Vizitor", sessionBadgeStyle: "font-size:13px;color:#605d5d",
+               ordersIntro: "Po lexohen porositë…", stockNote: "", myOrdersCount: "0",
+               loginName: "", loginEmail: "", sessionName: "", sessionEmail: "" };
+    }
+    const session = s.session;
+    const mine = session ? s.orders.filter((o) => o.email === session.email) : [];
+
+    return {
+      loggedIn: !!session,
+      loggedOut: !session,
+      sessionName: session ? session.name : "",
+      sessionEmail: session ? session.email : "",
+      sessionBadge: session ? session.email : "Vizitor",
+      sessionBadgeStyle: session
+        ? "font-size:13px;color:#7d5411;border:1px solid #b68235;border-radius:3px;padding:5px 12px"
+        : "font-size:13px;color:#605d5d",
+      myOrdersCount: String(mine.length),
+      notice: this.state.notice,
+      noticeStyle: NOTICE,
+      loginName: this.state.login.name,
+      loginEmail: this.state.login.email,
+      onLoginName: (e) => this.setState({ login: Object.assign({}, this.state.login, { name: e.target.value }) }),
+      onLoginEmail: (e) => this.setState({ login: Object.assign({}, this.state.login, { email: e.target.value }) }),
+      login: this.login,
+      logout: this.logout,
+
+      stockNote: "Sasitë tregojnë stokun aktual në magazinë — zbritet sapo porosia konfirmohet.",
+      products: s.products.map((p) => {
+        const out = p.stock === 0;
+        return {
+          name: p.name, category: p.category, blurb: p.blurb,
+          image: p.image || "assets/products/laptop.jpg",
+          priceLabel: p.price.toFixed(2) + " €",
+          stockLabel: out ? "Pa stok" : (p.stock <= 3 ? p.stock + " copë — i pakët" : p.stock + " copë në magazinë"),
+          stockStyle: out ? STOCK_OUT : (p.stock <= 3 ? STOCK_LOW : STOCK_OK),
+          cardStyle: out ? CARD_OUT : CARD,
+          qty: String(this.state.qty[p.id] ?? 1),
+          onQty: (e) => this.setState({ qty: Object.assign({}, this.state.qty, { [p.id]: e.target.value }) }),
+          btnLabel: out ? "Pa stok" : "Porosit",
+          btnStyle: out ? BTN_OFF : BTN,
+          order: out ? () => this.setState({ notice: "Ky artikull është pa stok — porosia nuk mund të rezervohet." })
+                     : () => this.order(p),
+        };
+      }),
+
+      ordersIntro: session
+        ? "Porositë lidhen me emailin " + session.email + ". Statusi vjen nga verifikimi i stokut, jo nga një hap manual."
+        : "Hyni me email lart për të shfaqur porositë tuaja.",
+      myOrders: mine.map((o) => {
+        const st = STATUS[o.status] || STATUS.pending;
+        return {
+          id: String(o.id), created: o.created,
+          itemsLabel: o.qty + " × " + o.productName,
+          total: (o.qty * o.unitPrice).toFixed(2) + " €",
+          statusLabel: st.label, pillStyle: st.style, message: st.msg,
+          canReturn: o.status === "reserved",
+          requestReturn: () => this.requestReturn(o.id),
+        };
+      }),
+
+      proofs: [
+        { q: "Ku është API Key?", a: "Në .env jashtë Git-it; kodi e lexon me os.getenv dhe verify_api_key e krahason me header-in X-API-Key. Kjo faqe nuk e mban kurrë kyçin — në panel vendoset dorazi.",
+          file: "*/app/security.py · .env.example" },
+        { q: "Çfarë sigurie ka?", a: "Kontroll qasjeje në çdo endpoint biznesi, kredenciale nga mjedisi, izolim i bazave, logs për çdo kërkesë dhe audit log për shkrimet.",
+          file: "security.py · logging_middleware.py · audit.py" },
+        { q: "Si hyn klienti me email?", a: "Emaili është identifikuesi unik i klientit (kolona email me unique); pa fjalëkalim, sepse sistemi nuk mban sesione — porosia lidhet me klientin përmes emailit.",
+          file: "order-service/app/models.py → Customer.email" },
+        { q: "Si e dinë klienti që porosia është në rregull?", a: "Statusi kalon vetë nga Në verifikim në Konfirmuar ose Stok i pamjaftueshëm, dhe Notification Service dërgon email për çdo ndryshim.",
+          file: "notification-service/app/consumer.py" },
+        { q: "A ka mundësi kthimi?", a: "Po, dhe është funksionale: butoni Kërko kthim rikthen sasinë në stok dhe shënon porosinë E kthyer — shihet menjëherë në panel.",
+          file: "spdd-store.js → returnOrder()" },
+        { q: "Ku është ERD-ja?", a: "Në dokumentimin teknik dhe në repo si diagramë Mermaid: Customer 1—N Order 1—N OrderItem, plus Product në domenin e stokut.",
+          file: "docs/ARKITEKTURA.md · Raporti teknik §4.2" },
+        { q: "Çfarë ndodh nëse shërbimi bie?", a: "Porositë vazhdojnë të pranohen dhe presin në radhë; pas rindezjes procesohen pa humbje, sepse ack-u është manual.",
+          file: "Paneli → Ndal shërbimin e stokut" },
+        { q: "A është e realizuar apo e simuluar?", a: "Paneli ka modalitetin Sistemi real: me API key dhe docker compose të ngritur, kërkesat shkojnë në shërbimet e vërteta dhe të dhënat vijnë nga PostgreSQL.",
+          file: "Paneli → Sistemi real" },
+      ],
+    };
+  }
+}
+</script>
+</body>
+</html>
