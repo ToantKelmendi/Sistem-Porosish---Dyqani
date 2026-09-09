@@ -1,0 +1,13 @@
+{
+  "type": "record",
+  "name": "OrderStockFailed",
+  "namespace": "com.spdd.orders.events",
+  "doc": "Publikohet nga Inventory Service kur një artikull nuk ka stok të mjaftueshëm.",
+  "fields": [
+    { "name": "orderId", "type": "int" },
+    { "name": "reason", "type": "string", "default": "insufficient_stock" },
+    { "name": "failedProductId", "type": ["null", "int"], "default": null },
+    { "name": "failedAt", "type": "string" },
+    { "name": "schemaVersion", "type": "int", "default": 1 }
+  ]
+}

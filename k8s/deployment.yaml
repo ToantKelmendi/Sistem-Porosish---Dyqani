@@ -1,0 +1,160 @@
+# Deployment-et që HPA-ja e k8s/hpa.yaml shkallëzon.
+#
+# Përse ekzistojnë: një HorizontalPodAutoscaler pa Deployment-in e tij nuk
+# aplikohet — scaleTargetRef duhet të tregojë te një objekt real. Këto dy
+# manifeste janë përkthimi i drejtpërdrejtë i shërbimeve nga docker-compose.yml
+# në Kubernetes: të njëjtat variabla mjedisi, i njëjti /health, të njëjtat porte.
+#
+# Kredencialet nuk qëndrojnë këtu — vijnë nga Secret-i `spdd-secrets`, njësoj si
+# .env në ekzekutimin lokal.
+#
+# Aplikimi:
+#   kubectl apply -f k8s/deployment.yaml
+#   kubectl apply -f k8s/hpa.yaml
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: order-service
+  labels:
+    app: order-service
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: order-service
+  template:
+    metadata:
+      labels:
+        app: order-service
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8001"
+        prometheus.io/path: /metrics
+    spec:
+      containers:
+        - name: order-service
+          image: order-service:1.1.0
+          ports:
+            - containerPort: 8001
+          env:
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: spdd-secrets
+                  key: orders-database-url
+            - name: RABBITMQ_URL
+              valueFrom:
+                secretKeyRef:
+                  name: spdd-secrets
+                  key: rabbitmq-url
+            - name: API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: spdd-secrets
+                  key: api-key
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8001
+            initialDelaySeconds: 10
+            periodSeconds: 20
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8001
+            initialDelaySeconds: 5
+            periodSeconds: 10
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: order-service
+spec:
+  selector:
+    app: order-service
+  ports:
+    - port: 8001
+      targetPort: 8001
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: inventory-service
+  labels:
+    app: inventory-service
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: inventory-service
+  template:
+    metadata:
+      labels:
+        app: inventory-service
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8002"
+        prometheus.io/path: /metrics
+    spec:
+      containers:
+        - name: inventory-service
+          image: inventory-service:1.1.0
+          ports:
+            - containerPort: 8002
+          env:
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: spdd-secrets
+                  key: inventory-database-url
+            - name: RABBITMQ_URL
+              valueFrom:
+                secretKeyRef:
+                  name: spdd-secrets
+                  key: rabbitmq-url
+            - name: API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: spdd-secrets
+                  key: api-key
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8002
+            initialDelaySeconds: 10
+            periodSeconds: 20
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8002
+            initialDelaySeconds: 5
+            periodSeconds: 10
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: inventory-service
+spec:
+  selector:
+    app: inventory-service
+  ports:
+    - port: 8002
+      targetPort: 8002

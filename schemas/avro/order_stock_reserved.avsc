@@ -1,0 +1,11 @@
+{
+  "type": "record",
+  "name": "OrderStockReserved",
+  "namespace": "com.spdd.orders.events",
+  "doc": "Publikohet nga Inventory Service pasi stoku zbritet me sukses.",
+  "fields": [
+    { "name": "orderId", "type": "int" },
+    { "name": "reservedAt", "type": "string" },
+    { "name": "schemaVersion", "type": "int", "default": 1 }
+  ]
+}

@@ -1,0 +1,26 @@
+{
+  "type": "record",
+  "name": "OrderCreated",
+  "namespace": "com.spdd.orders.events",
+  "doc": "Publikohet nga Order Service pasi porosia ruhet me status pending.",
+  "fields": [
+    { "name": "orderId", "type": "int" },
+    { "name": "customerEmail", "type": "string" },
+    {
+      "name": "items",
+      "type": {
+        "type": "array",
+        "items": {
+          "type": "record",
+          "name": "OrderItem",
+          "fields": [
+            { "name": "productId", "type": "int" },
+            { "name": "quantity", "type": "int" }
+          ]
+        }
+      }
+    },
+    { "name": "timestamp", "type": "string" },
+    { "name": "schemaVersion", "type": "int", "default": 1 }
+  ]
+}

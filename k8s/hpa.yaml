@@ -1,0 +1,89 @@
+# HorizontalPodAutoscaler për prodhim në Kubernetes.
+# Modeli i marrë nga k8s/hpa.yaml i platformës Fiks: autoscaling/v2, shkallëzim
+# sipas CPU 70% / RAM 80%, ngjitje e shpejtë dhe zbritje e stabilizuar.
+# Order Service shkallëzohet me trafikun HTTP; Inventory Service me thellësinë e radhës.
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: order-service-hpa
+  labels:
+    app: order-service
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: order-service
+  minReplicas: 2
+  maxReplicas: 10
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 70
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: 80
+  behavior:
+    scaleUp:
+      stabilizationWindowSeconds: 0
+      policies:
+        - type: Percent
+          value: 100
+          periodSeconds: 15
+        - type: Pods
+          value: 4
+          periodSeconds: 15
+      selectPolicy: Max
+    scaleDown:
+      stabilizationWindowSeconds: 300
+      policies:
+        - type: Percent
+          value: 10
+          periodSeconds: 60
+
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: inventory-service-hpa
+  labels:
+    app: inventory-service
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: inventory-service
+  minReplicas: 2
+  maxReplicas: 8
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 70
+    # Metrika e jashtme: sa mesazhe presin në radhën e konsumatorit.
+    # Kërkon prometheus-adapter të instaluar në cluster.
+    - type: External
+      external:
+        metric:
+          name: rabbitmq_queue_messages_ready
+          selector:
+            matchLabels:
+              queue: inventory_order_created
+        target:
+          type: AverageValue
+          averageValue: "50"
+  behavior:
+    scaleDown:
+      stabilizationWindowSeconds: 300
+      policies:
+        - type: Percent
+          value: 10
+          periodSeconds: 60
