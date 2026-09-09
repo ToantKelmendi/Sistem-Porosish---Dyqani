@@ -1,0 +1,25 @@
+# Sekretet — kurrë në Git
+.env
+*.pem
+*.key
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Baza lokale dhe logs
+*.sqlite3
+*.db
+*.log
+
+# Sisteme operative dhe redaktorë
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
