@@ -1,0 +1,135 @@
+# Orkestrimi i plotë i sistemit: një komandë ngre gjithçka.
+#
+#   docker compose up --build
+#
+# Asnjë kredencial nuk është i shkruar këtu — të gjitha vijnë nga .env, i cili
+# nuk ndodhet në Git. Shih .env.example për çelësat e kërkuar.
+#
+# healthcheck + depends_on: condition -> shërbimet nisen vetëm kur varësitë e
+# tyre janë vërtet gati, jo thjesht të startuara.
+
+services:
+  postgres-orders:
+    image: postgres:16
+    container_name: spdd-postgres-orders
+    restart: on-failure
+    environment:
+      POSTGRES_USER: ${ORDERS_DB_USER}
+      POSTGRES_PASSWORD: ${ORDERS_DB_PASSWORD}
+      POSTGRES_DB: ${ORDERS_DB_NAME}
+    ports:
+      - "5433:5432"
+    volumes:
+      - orders_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${ORDERS_DB_USER} -d ${ORDERS_DB_NAME}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  postgres-inventory:
+    image: postgres:16
+    container_name: spdd-postgres-inventory
+    restart: on-failure
+    environment:
+      POSTGRES_USER: ${INVENTORY_DB_USER}
+      POSTGRES_PASSWORD: ${INVENTORY_DB_PASSWORD}
+      POSTGRES_DB: ${INVENTORY_DB_NAME}
+    ports:
+      - "5434:5432"
+    volumes:
+      - inventory_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${INVENTORY_DB_USER} -d ${INVENTORY_DB_NAME}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: spdd-rabbitmq
+    restart: on-failure
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD}
+    ports:
+      - "5672:5672"     # protokolli AMQP
+      - "15672:15672"   # ndërfaqja e menaxhimit
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: spdd-redis
+    restart: on-failure
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  order-service:
+    build: ./order-service
+    container_name: spdd-order-service
+    restart: on-failure
+    environment:
+      DATABASE_URL: postgresql://${ORDERS_DB_USER}:${ORDERS_DB_PASSWORD}@postgres-orders:5432/${ORDERS_DB_NAME}
+      RABBITMQ_URL: amqp://${RABBITMQ_USER}:${RABBITMQ_PASSWORD}@rabbitmq:5672/
+      API_KEY: ${API_KEY}
+    ports:
+      - "8001:8000"
+    depends_on:
+      postgres-orders:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request;urllib.request.urlopen('http://localhost:8000/health')\""]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+
+  inventory-service:
+    build: ./inventory-service
+    container_name: spdd-inventory-service
+    restart: on-failure
+    environment:
+      DATABASE_URL: postgresql://${INVENTORY_DB_USER}:${INVENTORY_DB_PASSWORD}@postgres-inventory:5432/${INVENTORY_DB_NAME}
+      RABBITMQ_URL: amqp://${RABBITMQ_USER}:${RABBITMQ_PASSWORD}@rabbitmq:5672/
+      REDIS_URL: redis://redis:6379/0
+      API_KEY: ${API_KEY}
+    ports:
+      - "8002:8000"
+    depends_on:
+      postgres-inventory:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request;urllib.request.urlopen('http://localhost:8000/health')\""]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+
+  notification-service:
+    build: ./notification-service
+    container_name: spdd-notification-service
+    restart: on-failure
+    environment:
+      RABBITMQ_URL: amqp://${RABBITMQ_USER}:${RABBITMQ_PASSWORD}@rabbitmq:5672/
+    ports:
+      - "8003:8000"
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+
+volumes:
+  orders_data:
+  inventory_data:
